@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
@@ -8,11 +8,11 @@ function App() {
   const [isLoading, setisLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetctMovieHandler = async () => {
+  const fetctMovieHandler = useCallback(async () => {
     setError(null);
     setisLoading(true);
     try {
-      const res = await fetch("https://swapi.dev/api/film/");
+      const res = await fetch("https://swapi.dev/api/films/");
       if (!res.ok) {
         throw new Error("Something went wrong ....Retrying ");
       }
@@ -31,9 +31,13 @@ function App() {
       console.log("error", error);
       console.log(error.message, "errorms");
       setError(error.message);
-      setisLoading(false);
     }
-  };
+    setisLoading(false);
+  }, []);
+  useEffect(() => {
+    fetctMovieHandler();
+  }, [fetctMovieHandler]);
+
   let content = <p>Found no movies</p>;
   if (movies.length > 0) {
     content = <MoviesList movies={movies} />;
