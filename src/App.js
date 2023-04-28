@@ -9,20 +9,6 @@ function App() {
   const [isLoading, setisLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  async function addMovieHandler(movie) {
-    const response = await fetch(
-      "https://connectingtodatabase-21c8b-default-rtdb.firebaseio.com/movies.json",
-      {
-        method: "POST",
-        body: JSON.stringify(movie),
-        handlers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const data = await response.json();
-    console.log(data);
-  }
   const fetctMovieHandler = useCallback(async () => {
     setError(null);
     setisLoading(true);
@@ -54,6 +40,21 @@ function App() {
     }
     setisLoading(false);
   }, []);
+  async function addMovieHandler(movie) {
+    const response = await fetch(
+      "https://connectingtodatabase-21c8b-default-rtdb.firebaseio.com/movies.json",
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        handlers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    fetctMovieHandler();
+    console.log(data);
+  }
   useEffect(() => {
     fetctMovieHandler();
   }, [fetctMovieHandler]);
@@ -62,7 +63,7 @@ function App() {
   if (movies.length > 0) {
     content = (
       <>
-        <MoviesList setMovies={setMovies} movies={movies} />
+        <MoviesList setMovies={fetctMovieHandler} movies={movies} />
       </>
     );
   }
