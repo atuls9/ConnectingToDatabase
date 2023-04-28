@@ -2,7 +2,7 @@ import React from "react";
 import "./AddMovies.css";
 import { useRef } from "react";
 
-const AddMovies = () => {
+const AddMovies = (props) => {
   const titleRef = useRef("");
   const openingTextRef = useRef("");
   const dateRef = useRef("");
@@ -14,6 +14,7 @@ const AddMovies = () => {
       openingText: openingTextRef.current.value,
       releaseDate: dateRef.current.value,
     };
+    props.onAddMovie(obj);
     console.log(obj);
   };
   return (

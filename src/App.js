@@ -9,25 +9,44 @@ function App() {
   const [isLoading, setisLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  async function addMovieHandler(movie) {
+    const response = await fetch(
+      "https://connectingtodatabase-21c8b-default-rtdb.firebaseio.com/movies.json",
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        handlers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
+  }
   const fetctMovieHandler = useCallback(async () => {
     setError(null);
     setisLoading(true);
     try {
-      const res = await fetch("https://swapi.dev/api/films/");
+      const res = await fetch(
+        "https://connectingtodatabase-21c8b-default-rtdb.firebaseio.com/movies.json"
+      );
       if (!res.ok) {
         throw new Error("Something went wrong ....Retrying ");
       }
       const jsonData = await res.json();
-      const transformedMovies = jsonData.results.map((movieData) => {
-        return {
-          id: movieData.episode_id,
-          title: movieData.title,
-          openingText: movieData.opening_crawl,
-          releaseDate: movieData.release_date,
-        };
-      });
 
-      setMovies(transformedMovies);
+      const loadedMovies = [];
+      for (const key in jsonData) {
+        console.log("object fetch key", key);
+        loadedMovies.push({
+          id: key,
+          title: jsonData[key].title,
+          openingText: jsonData[key].openingText,
+          releaseDate: jsonData[key].releaseDate,
+        });
+      }
+
+      setMovies(loadedMovies);
     } catch (error) {
       console.log("error", error);
       console.log(error.message, "errorms");
@@ -41,7 +60,11 @@ function App() {
 
   let content = <p>Found no movies</p>;
   if (movies.length > 0) {
-    content = <MoviesList movies={movies} />;
+    content = (
+      <>
+        <MoviesList setMovies={setMovies} movies={movies} />
+      </>
+    );
   }
   if (error) {
     const timeout = setTimeout(fetctMovieHandler, 5000);
@@ -67,7 +90,7 @@ function App() {
 
   return (
     <React.Fragment>
-      <AddMovies />
+      <AddMovies onAddMovie={addMovieHandler} />
       <section>
         <button onClick={fetctMovieHandler}>Fetch Movies</button>
       </section>
